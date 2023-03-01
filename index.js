@@ -39,8 +39,10 @@ const token = process.env.BOT_TOKKEN;
 client.login(token);
 
 client.once("ready", () => {
-  client.on("debug", console.log);
+  console.log("********************************************");
   console.log(`Logged in as ${client.user.tag}`);
+  console.log("********************************************");
+  console.log("\n\n");
 });
 
 // Create a new command handler map
@@ -53,13 +55,15 @@ for (const file of commandFiles) {
 }
 const prefix = "mu!";
 
-client.on("message", (message) => {
+client.on("messageCreate", (message) => {
   // Ignore messages that don't start with the prefix or are sent by bots
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   // Parse the command and arguments from the message content
   const args = message.content.slice(prefix.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
+  console.log(`Command: ${commandName}`);
+  console.log(`Arguments: ${args}`);
 
   // Get the command handler from the map
   const command = commands.get(commandName);

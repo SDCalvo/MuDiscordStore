@@ -1,6 +1,3 @@
-// Import required modules
-const { prefix } = require("./config");
-
 // Define the ping command handler
 module.exports = {
   name: "ping",

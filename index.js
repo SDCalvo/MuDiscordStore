@@ -45,7 +45,7 @@ app.post("/adduser", async (req, res) => {
     name: name,
     age: age,
   });
-
+  console.log("User added to Firestore!");
   res.send("User added to Firestore!");
 });
 

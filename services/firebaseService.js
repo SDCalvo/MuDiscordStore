@@ -5,8 +5,33 @@ function addUser(id, user) {
   return admin.firestore().collection('users').doc(id).create(user);
 }
 
+function editUser(id, user) {
+  return admin.firestore().collection('users').doc(id).set(user);
+}
+
 function reassignUser(id, user) {
   return admin.firestore().collection('users').doc(id).set(user);
+}
+
+// Store functions
+function addNewStoreEntry(id, storeEntry) {
+  return admin.firestore().collection('store').doc().create(storeEntry);
+}
+
+function editStoreEntry(id, storeEntry) {
+  return admin.firestore().collection('store').doc(id).set(storeEntry);
+}
+
+function deleteStoreEntry(id) {
+  return admin.firestore().collection('store').doc(id).delete();
+}
+
+function getAllStoreEntries() {
+  return admin.firestore().collection('store').get();
+}
+
+function getStoreEntriesByMode(mode) {
+  return admin.firestore().collection('store').where('mode', '==', mode).get();
 }
 
 const usersCache = [];
@@ -23,4 +48,14 @@ function cacheUsers() {
     });
 }
 
-export default { addUser, reassignUser, cacheUsers };
+export default {
+  addUser,
+  editUser,
+  reassignUser,
+  cacheUsers,
+  addNewStoreEntry,
+  editStoreEntry,
+  deleteStoreEntry,
+  getAllStoreEntries,
+  getStoreEntriesByMode,
+};

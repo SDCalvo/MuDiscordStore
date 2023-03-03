@@ -81,7 +81,6 @@ module.exports = {
 
     if (isListCommand) {
       const storeEntriesArray = await getStoreEntriesArray(message);
-      console.log(storeEntriesArray);
       if (!storeEntriesArray || storeEntriesArray.length === 0) {
         message.channel.send('No hay entradas en la tienda.');
         return;
@@ -177,16 +176,18 @@ module.exports = {
       return;
     }
 
-    const mode = args[0].split(modeSeparator)[0];
-    const content = args[0].split(modeSeparator)[1].split(priceSeparator)[0];
-    const price =
-      args[0].split(priceSeparator)[1] + ' ' + args.slice(1).join(' ');
+    const completeText = args.join(' ');
+    const mode = completeText.split(modeSeparator)[0];
+    const content = completeText
+      .split(modeSeparator)[1]
+      .split(priceSeparator)[0];
+    const price = completeText.split(priceSeparator)[1];
 
     const storeModePrefixValues = Object.values(storeModePrefix);
 
     if (!storeModePrefixValues.includes(mode) || !content || !price) {
       message.reply(
-        'Comando incorrecto, usa "c" para comprar, "v" para vender o "i" para intercambiar. Por ejemplo: ***mu!store c>item=precio*** o ***mu!store v>item=precio*** o ***mu!store i>item=otro item***',
+        'Comando incorrecto, usa "c" para comprar, "v" para vender o "i" para intercambiar (En minúsculas). Por ejemplo: ***mu!store c>item=precio*** o ***mu!store v>item=precio*** o ***mu!store i>item=otro item***.',
       );
       return;
     }
@@ -203,6 +204,7 @@ module.exports = {
       price,
       image: attachments[0]?.url || attachments[0]?.proxyURL || null,
       messageId: message.id,
+      createdAt: new Date().toISOString(),
     };
 
     //Check if user has already the same store entry

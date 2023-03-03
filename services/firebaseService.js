@@ -17,6 +17,10 @@ function getUserById(id) {
   return admin.firestore().collection('users').doc(id).get();
 }
 
+function getAllUsers() {
+  return admin.firestore().collection('users').get();
+}
+
 // Store functions
 async function addNewStoreEntry(storeEntry) {
   //Return the new doc id
@@ -67,6 +71,7 @@ export default {
   editUser,
   reassignUser,
   getUserById,
+  getAllUsers,
   cacheUsers,
   addNewStoreEntry,
   getStoreEntryById,

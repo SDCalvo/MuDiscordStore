@@ -3,6 +3,7 @@ import firebaseService from './services/firebaseService';
 import admin from './config/firebase';
 const userRoutes = require('./routes/usersRoutes');
 import Discord from 'discord.js';
+import storeService from './services/storeService';
 
 // -------------------------------------------------------------------------------------------------------Firebase stuff
 firebaseService.cacheUsers();
@@ -135,3 +136,9 @@ app.post('/adduser', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+// -------------------------------------------- Store Deleting Timeout
+// run once a day
+setInterval(async () => {
+  await storeService.deleteOldStoreEntries();
+}, 1000 * 60 * 60 * 24);

@@ -23,7 +23,7 @@ module.exports = {
   name: 'store',
   description: 'Vende, cambia o compra items desde discord.',
   async execute(message, args) {
-    if (!message.startsWith('mu!store')) {
+    if (!message.content.startsWith('mu!store')) {
       message.reply(
         'Comando inexsistente. Utiliza "mu!store help" para ver todos los comandos disponibles.',
       );
@@ -81,7 +81,20 @@ module.exports = {
 
     if (isListCommand) {
       const storeEntriesArray = await getStoreEntriesArray(message);
+      console.log(storeEntriesArray);
+      if (!storeEntriesArray || storeEntriesArray.length === 0) {
+        message.channel.send('No hay entradas en la tienda.');
+        return;
+      }
+
       storeEntriesArray.forEach((entry) => {
+        const row = new Discord.ActionRowBuilder().addComponents(
+          new Discord.ButtonBuilder()
+            .setCustomId(`delete-btn-${entry.id}`)
+            .setLabel('Eliminar')
+            .setStyle(Discord.ButtonStyle.Danger),
+        );
+
         const embededMessage = new Discord.EmbedBuilder()
           .setColor('#0099ff')
           .setTitle(`${entry.content}`)
@@ -96,8 +109,7 @@ module.exports = {
           .setImage(entry.image)
           .setTimestamp();
 
-        message.channel.send({ embeds: [embededMessage] });
-        return;
+        message.channel.send({ embeds: [embededMessage], components: [row] });
       });
 
       return;
@@ -190,6 +202,7 @@ module.exports = {
       content,
       price,
       image: attachments[0]?.url || attachments[0]?.proxyURL || null,
+      messageId: message.id,
     };
 
     //Check if user has already the same store entry
@@ -206,7 +219,10 @@ module.exports = {
       return;
     }
 
-    firebaseService.addNewStoreEntry(user.id, storeEntry);
+    const newEntryId = await firebaseService.addNewStoreEntry(storeEntry);
+
+    //Add store entry id to entry object
+    storeEntry.id = newEntryId;
     //Update user with new store entry
     userStoreEntries.push(storeEntry);
     userDoc.storeEntries = userStoreEntries;
@@ -232,11 +248,6 @@ async function getStoreEntriesArray(message) {
   storeEntries.forEach((entry) => {
     storeEntriesArray.push(entry.data());
   });
-
-  if (!storeEntriesArray.length) {
-    message.reply('No hay entradas en la tienda.');
-    return;
-  }
 
   return storeEntriesArray;
 }

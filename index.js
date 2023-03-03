@@ -2,6 +2,7 @@ require('dotenv').config();
 import firebaseService from './services/firebaseService';
 import admin from './config/firebase';
 const userRoutes = require('./routes/usersRoutes');
+import Discord from 'discord.js';
 
 // -------------------------------------------------------------------------------------------------------Firebase stuff
 firebaseService.cacheUsers();
@@ -19,7 +20,7 @@ const commandFiles = fs
   .filter((file) => file.endsWith('.js'));
 const { Client, GatewayIntentBits, Partials } = require('discord.js');
 
-const client = new Client({
+export const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
@@ -43,6 +44,44 @@ client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
   console.log('********************************************');
   console.log('\n\n');
+});
+
+// Handle delete item from store button
+client.on(Discord.Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isButton()) return;
+  if (interaction.customId.includes('delete-btn')) {
+    //get user by id
+    const user = await firebaseService.getUserById(interaction.user.id);
+    const userData = user.data();
+    const usersStoreEntries = userData.storeEntries;
+    const entryId = interaction.customId.split('-').pop();
+    //Make sure the user is the author of the store entry
+    const entry = await firebaseService.getStoreEntryById(entryId);
+    const entryData = entry.data();
+    if (entryData.userId !== interaction.user.id)
+      return interaction.reply({
+        content: 'No eres el autor de este mensaje.',
+        ephemeral: true,
+      });
+
+    // delete store entry
+    await firebaseService.deleteStoreEntry(entryId);
+    // delete user store entry
+    const filteredStoreEntries = usersStoreEntries.filter(
+      (entry) => entry.id !== entryId,
+    );
+    // update user store entries
+    await firebaseService.editUser(interaction.user.id, {
+      ...userData,
+      storeEntries: filteredStoreEntries,
+    });
+
+    interaction.message.delete();
+    return interaction.reply({
+      content: 'Entrada eliminada.',
+      ephemeral: true,
+    });
+  }
 });
 
 // Create a new command handler map

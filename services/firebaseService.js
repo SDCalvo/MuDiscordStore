@@ -13,9 +13,19 @@ function reassignUser(id, user) {
   return admin.firestore().collection('users').doc(id).set(user);
 }
 
+function getUserById(id) {
+  return admin.firestore().collection('users').doc(id).get();
+}
+
 // Store functions
-function addNewStoreEntry(id, storeEntry) {
-  return admin.firestore().collection('store').doc().create(storeEntry);
+async function addNewStoreEntry(storeEntry) {
+  //Return the new doc id
+  const docRef = admin.firestore().collection('store').doc();
+  //Add new doc id as a field in the storeEntry object
+  storeEntry.id = docRef.id;
+  docRef.set(storeEntry);
+  console.log('New store entry added with id: ', docRef.id);
+  return docRef.id;
 }
 
 function editStoreEntry(id, storeEntry) {
@@ -28,6 +38,10 @@ function deleteStoreEntry(id) {
 
 function getAllStoreEntries() {
   return admin.firestore().collection('store').get();
+}
+
+function getStoreEntryById(id) {
+  return admin.firestore().collection('store').doc(id).get();
 }
 
 function getStoreEntriesByMode(mode) {
@@ -52,8 +66,10 @@ export default {
   addUser,
   editUser,
   reassignUser,
+  getUserById,
   cacheUsers,
   addNewStoreEntry,
+  getStoreEntryById,
   editStoreEntry,
   deleteStoreEntry,
   getAllStoreEntries,

@@ -82,7 +82,7 @@ module.exports = {
     if (isListCommand) {
       const storeEntriesArray = await getStoreEntriesArray(message);
       if (!storeEntriesArray || storeEntriesArray.length === 0) {
-        message.channel.send('No hay entradas en la tienda.');
+        message.channel.send('***No hay entradas en la tienda.***');
         return;
       }
 
@@ -116,6 +116,10 @@ module.exports = {
 
     if (isTableCommand) {
       const storeEntriesArray = await getStoreEntriesArray(message);
+      if (!storeEntriesArray || storeEntriesArray.length === 0) {
+        message.channel.send('***No hay entradas en la tienda.***');
+        return;
+      }
       //Table with all store entries
       const padding = 8;
       const formatedStoreEntries = storeEntriesArray

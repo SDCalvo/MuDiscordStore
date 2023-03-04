@@ -1,18 +1,7 @@
 require('dotenv').config();
 import firebaseService from './services/firebaseService';
-import admin from './config/firebase';
-const userRoutes = require('./routes/usersRoutes');
 import Discord from 'discord.js';
 import storeService from './services/storeService';
-
-// -------------------------------------------------------------------------------------------------------Firebase stuff
-firebaseService.cacheUsers();
-const db = admin.firestore();
-
-// ----------------------------------------------------------------------------------Set up express
-const express = require('express');
-const app = express();
-const port = 9000;
 
 // -----------------------------------------------------------------------------------Set up Discord client
 const fs = require('fs');
@@ -115,26 +104,6 @@ client.on('messageCreate', (message) => {
     console.error(error);
     message.reply('There was an error executing that command.');
   }
-});
-
-// --------------------------------------------------------------------------------------------------------Set up Express routes
-app.use('/users', userRoutes);
-
-app.post('/adduser', async (req, res) => {
-  const name = req.body.name;
-  const age = req.body.age;
-
-  await db.collection('users').add({
-    name: name,
-    age: age,
-  });
-  console.log('User added to Firestore!');
-  res.send('User added to Firestore!');
-});
-
-// Start Express server
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
 });
 
 // -------------------------------------------- Store Deleting Timeout

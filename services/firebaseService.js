@@ -5,6 +5,8 @@ function addUser(id, user) {
   return admin.firestore().collection('users').doc(id).create(user);
 }
 
+console.log('text');
+
 function editUser(id, user) {
   return admin.firestore().collection('users').doc(id).set(user);
 }
